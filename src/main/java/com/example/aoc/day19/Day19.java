@@ -60,6 +60,32 @@ public class Day19 {
         }
         return dest;
     }
+
+    List<List<String>> successfulPaths = new ArrayList<>();
+    private void getAllOutcomes(List<Step> workflow, List<String> path) {
+        ArrayList<String> current = new ArrayList<>(path);
+        workflow.forEach(step -> {
+            String destination = step.destination;
+            if (destination.equals("R")) {
+                return;
+            }
+            if (!step.isFinal) {
+                String category = step.category;
+                String operator = step.operator;
+                Integer operand = step.operand;
+                String condition = category + operator + operand;
+                current.add(condition);
+            }
+            if (destination.equals("A")) {
+                successfulPaths.add(current);
+                return;
+            }
+            getAllOutcomes(workflows.get(destination).steps, current);
+
+        });
+
+    }
+
     public int moveAll() {
        return parts.stream()
                .filter(part -> move(part, workflows.get("in"), "in").equals("A"))
@@ -68,11 +94,16 @@ public class Day19 {
                .orElse(0);
     }
 
+    public void getAllPaths() {
+       getAllOutcomes(workflows.get("in").steps, List.of());
+        System.out.println("ok");
+    }
+
     public static void main(String[] args) throws IOException {
         String input = Utils.readFile(new File("src/main/java/com/example/aoc/day19/input.txt"));
         Day19 day19 = new Day19();
         day19.parseInput(input);
-        System.out.println("");
         System.out.println(day19.moveAll());
+        day19.getAllPaths();
     }
 }
