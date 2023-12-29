@@ -5,6 +5,7 @@ import com.example.aoc.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class HeatLoss {
 
@@ -24,7 +25,7 @@ public class HeatLoss {
         private int weight;
         private int distance = Integer.MAX_VALUE;
         private Set<Node> adjacentNodes = new HashSet<>();
-        private List<Node> shortestPath = new LinkedList<>();
+        private List<Node> shortestPath = new ArrayList<>();
 
         public Node(int x, int y, int weight) {
             this.position = new Position(x, y);
@@ -67,6 +68,30 @@ public class HeatLoss {
         public int hashCode() {
             return position.hashCode();
         }
+
+        public enum Direction{LEFT, RIGHT, UP, DOWN};
+
+        public Direction getCurrentDirection() {
+            return !shortestPath.isEmpty() ? shortestPath.get(shortestPath.size()-1).getDirection(this) : Direction.RIGHT;
+        }
+
+        public Direction getDirection(Node next) {
+            if (position.x < next.position.x)
+                return Direction.DOWN;
+            else if (position.x > next.position.x)
+                return Direction.UP;
+            else if (position.y > next.position.y)
+                return Direction.LEFT;
+            else
+                return Direction.RIGHT;
+        }
+
+        public boolean isValidNeighbour(Node next){
+            return shortestPath.size() < 3 || !IntStream.range(shortestPath.size() - 2, shortestPath.size())
+                    .mapToObj(shortestPath::get)
+                    .map(Node::getCurrentDirection)
+                    .allMatch(d -> d.equals(getDirection(next)) && d.equals(getCurrentDirection()));
+        }
     }
 
 
@@ -103,12 +128,9 @@ public class HeatLoss {
 
     public void calculateShortestPathFromSource(Node source) {
         source.setDistance(0);
-
         Set<Node> settledNodes = new HashSet<>();
         Set<Node> unsettledNodes = new HashSet<>();
-
         unsettledNodes.add(source);
-
         while (!unsettledNodes.isEmpty()) {
             Node currentNode = getLowestDistanceNode(unsettledNodes);
             unsettledNodes.remove(currentNode);
@@ -122,10 +144,9 @@ public class HeatLoss {
         }
     }
 
-    private void calculateMinimumDistance(Node evaluationNode,
-                                                 Integer edgeWeigh, Node sourceNode) {
+    private void calculateMinimumDistance(Node evaluationNode, Integer edgeWeigh, Node sourceNode) {
         Integer sourceDistance = sourceNode.getDistance();
-        if (sourceDistance + edgeWeigh < evaluationNode.getDistance()) {
+        if (sourceDistance + edgeWeigh < evaluationNode.getDistance() && sourceNode.isValidNeighbour(evaluationNode)) {
             evaluationNode.setDistance(sourceDistance + edgeWeigh);
             LinkedList<Node> shortestPath = new LinkedList<>(sourceNode.getShortestPath());
             shortestPath.add(sourceNode);
