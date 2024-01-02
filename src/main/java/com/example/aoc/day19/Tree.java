@@ -1,55 +1,42 @@
 package com.example.aoc.day19;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Tree {
+    Day19.Node root;
 
-    public static class Node {
-        String label;
-        String category;
-        String operator;
-        Integer operand;
-        String destination;
-        Node left;
-        Node right;
+    String label;
 
-
-        public Node(String label, String category, String operator, Integer operand, String destination) {
-            this.label = label;
-            this.category = category;
-            this.operator = operator;
-            this.operand = operand;
-            this.destination=destination;
-            left = null;
-            right=null;
-        }
-
-        public Node(String label) {
-            this.label = label;
-        }
+    public Tree( String label) {
+        this.root = null;
+        this.label = label;
     }
-    Node root;
 
-    private Node addRecursive(Node current, Node next) {
+    private Day19.Node addRecursive(Day19.Node current, Day19.Step currentStep, Map<String, Day19.Workflow> subtrees, List<Day19.Step> steps) {
         if (current == null) {
-            return new Node(next.label, next.category, next.operator,
-                    next.operand, next.destination);
+            if (currentStep.getCondition().equals(""))
+                return new Day19.Node(currentStep.destination(), null, null);
+            steps = subtrees.get(currentStep.destination()).steps();
+            current = new Day19.Node(steps.get(0).getCondition(), null, null);
         }
-        current.left = addRecursive(current.left, next);
-        current.right = addRecursive(current.right, next);
-
+            current.left = addRecursive(current.left, steps.get(0), subtrees, steps);
+            current.right = addRecursive(current.right, steps.get(1), subtrees, steps.subList(1, steps.size()));
         return current;
     }
 
-    private void add(Node node) {
-        root = addRecursive(root, node);
+    public void add(Day19.Node root, Map<String, Day19.Workflow> subtrees) {
+        this.root = addRecursive(root, subtrees.get("in").steps().get(0), subtrees, subtrees.get("in").steps());
     }
 
-    public void add(List<Node> nodes){
-        for(Node node: nodes){
-            add(node);
+    public void traversePreOrder(Day19.Node node) {
+        if (node != null) {
+            System.out.print(" " + node.condition);
+            traversePreOrder(node.left);
+            traversePreOrder(node.right);
         }
     }
-
-
 }
