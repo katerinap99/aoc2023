@@ -11,8 +11,26 @@ import java.util.stream.Collectors;
 public class Day19 {
     private List<Map<String, Integer>> parts = new ArrayList<>();
     private Map<String, Workflow> workflows =new HashMap<>();
+
+    private List<Tree> trees = new ArrayList<>();
     public record Workflow(String label, List<Step> steps){}
-    public record Step(String category, String operator, Integer operand, String destination, boolean isFinal){}
+    public record Step(String category, String operator, Integer operand, String destination, boolean isFinal) {
+        public String getCondition() {
+            return isFinal ? "" : category + operator+operand.toString() ;
+        }
+    }
+
+    public static class Node{
+        String condition;
+        Node left;
+        Node right;
+
+        public Node(String condition, Node left, Node right) {
+            this.condition = condition;
+            this.left = left;
+            this.right = right;
+        }
+    }
 
     public void parseInput(String input) {
         String[] inputParts = input.split("\n\n");
@@ -70,11 +88,7 @@ public class Day19 {
                 return;
             }
             if (!step.isFinal) {
-                String category = step.category;
-                String operator = step.operator;
-                Integer operand = step.operand;
-                String condition = category + operator + operand;
-                current.add(condition);
+                current.add(step.getCondition());
             }
             if (destination.equals("A")) {
                 successfulPaths.add(current);
@@ -99,11 +113,15 @@ public class Day19 {
         System.out.println("ok");
     }
 
+
     public static void main(String[] args) throws IOException {
         String input = Utils.readFile(new File("src/main/java/com/example/aoc/day19/input.txt"));
         Day19 day19 = new Day19();
         day19.parseInput(input);
         System.out.println(day19.moveAll());
         day19.getAllPaths();
+        Tree tree = new Tree("in");
+        tree.add(new Node(day19.workflows.get("in").steps.get(0).getCondition(), null, null), day19.workflows);
+        tree.traversePreOrder(tree.root);
     }
 }
