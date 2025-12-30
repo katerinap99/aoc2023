@@ -1,4 +1,4 @@
-package com.example.aoc.day19;
+package com.example.aoc.year2023.day19;
 
 import com.example.aoc.Utils;
 
@@ -33,8 +33,8 @@ public class Day19 {
     }
 
     public void parseInput(String input) {
-        String[] inputParts = input.split("\n\n");
-        this.workflows =  Arrays.stream(inputParts[0].split("\n")).map(line -> {
+        String[] inputParts = input.split("\r\n\r\n");
+        this.workflows =  Arrays.stream(inputParts[0].split("\r\n")).map(line -> {
             String[] workflow = line.split("\\{");
             String[] steps = workflow[1].substring(0, workflow[1].length() - 1).split(",");
             String finalState = steps[steps.length - 1];
@@ -49,7 +49,7 @@ public class Day19 {
             stepsList.add(finalStep);
             return new Workflow(workflow[0], stepsList);
         }).collect(Collectors.toMap(Workflow::label, Function.identity()));
-        this.parts = Arrays.stream(inputParts[1].split("\n"))
+        this.parts = Arrays.stream(inputParts[1].split("\r\n"))
                 .map(line -> {
                     line = line.substring(1, line.length()-1);
                     String[] ratings = line.split(",");

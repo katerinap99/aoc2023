@@ -9,9 +9,9 @@ import java.util.stream.IntStream;
 
 public class HeatLoss {
 
-    private Set<Node> nodes = new HashSet<>();
+    private final Set<Node> nodes = new HashSet<>();
 
-    private Map<Position, Node> nodesMap = new HashMap<>();
+    private final Map<Position, Node> nodesMap = new HashMap<>();
 
     public record Position(int x, int y){
         @Override
@@ -154,7 +154,7 @@ public class HeatLoss {
         }
     }
 
-    private static Node getLowestDistanceNode(Set<Node> unsettledNodes) {
+    private Node getLowestDistanceNode(Set<Node> unsettledNodes) {
         Node lowestDistanceNode = null;
         int lowestDistance = Integer.MAX_VALUE;
         for (Node node: unsettledNodes) {

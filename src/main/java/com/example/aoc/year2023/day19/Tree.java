@@ -1,10 +1,7 @@
-package com.example.aoc.day19;
+package com.example.aoc.year2023.day19;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class Tree {
     Day19.Node root;
